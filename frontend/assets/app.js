@@ -1,4 +1,10 @@
-const API_BASE = "http://localhost:5000/api"; // adjust if backend runs elsewhere
+// Determine API base dynamically:
+// - If window.API_BASE_URL is set (via <script>), use it
+// - Else, default to relative /api which works with reverse proxies/rewrites
+// - In local dev without proxy, you can set window.API_BASE_URL = "http://localhost:5000/api"
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE_URL)
+  ? window.API_BASE_URL.replace(/\/$/, '')
+  : '/api';
 
 const els = {
   form: document.getElementById("expense-form"),

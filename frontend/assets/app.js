@@ -3,8 +3,28 @@
 // - Else, default to relative /api which works with reverse proxies/rewrites
 // - In local dev without proxy, you can set window.API_BASE_URL = "http://localhost:5000/api"
 const API_BASE = (typeof window !== 'undefined' && window.API_BASE_URL)
-  ? window.API_BASE_URL.replace(/\/$/, '')
+  ? String(window.API_BASE_URL || '').replace(/\/$/, '')
   : '/api';
+
+function apiUrl(path, queryParams = null) {
+  const cleanedPath = String(path || '').startsWith('/') ? path : `/${path || ''}`;
+  const isAbsolute = /^https?:\/\//i.test(API_BASE);
+  let base = API_BASE;
+  if (!isAbsolute) {
+    base = API_BASE.startsWith('/') ? API_BASE : `/${API_BASE}`;
+  }
+  const url = isAbsolute
+    ? new URL(cleanedPath.replace(/^\//, ''), `${base.replace(/\/$/, '/')}`)
+    : new URL(`${base.replace(/\/$/, '')}${cleanedPath}`, window.location.origin);
+  if (queryParams && typeof queryParams === 'object') {
+    Object.entries(queryParams).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && String(v).length) {
+        url.searchParams.set(k, String(v));
+      }
+    });
+  }
+  return url.toString();
+}
 
 const els = {
   form: document.getElementById("expense-form"),
@@ -132,10 +152,9 @@ function renderRows(items) {
 
 async function refreshList() {
   const cat = els.filterCategory.value || "";
-  const url = new URL(`${API_BASE}/expenses`);
-  if (cat) url.searchParams.set("category", cat);
+  const url = apiUrl('/expenses', cat ? { category: cat } : null);
   try {
-    const items = await fetchJSON(url.toString());
+    const items = await fetchJSON(url);
     renderRows(items);
     populateFilter(items);
     cacheSet("expenses", items);
@@ -223,10 +242,10 @@ async function onSubmit(e) {
   };
   try {
     if (els.id.value) {
-      await fetchJSON(`${API_BASE}/expenses/${els.id.value}`, { method: "PUT", body: JSON.stringify(payload) });
+      await fetchJSON(apiUrl(`/expenses/${els.id.value}`), { method: "PUT", body: JSON.stringify(payload) });
       showToast("Updated");
     } else {
-      await fetchJSON(`${API_BASE}/expenses`, { method: "POST", body: JSON.stringify(payload) });
+      await fetchJSON(apiUrl('/expenses'), { method: "POST", body: JSON.stringify(payload) });
       showToast("Added");
     }
     setForm({});
@@ -247,7 +266,7 @@ function onTableClick(e) {
     if (item) setForm(item);
   } else if (action === "delete") {
     if (!confirm("Delete this entry?")) return;
-    fetchJSON(`${API_BASE}/expenses/${id}`, { method: "DELETE" })
+    fetchJSON(apiUrl(`/expenses/${id}`), { method: "DELETE" })
       .then(() => Promise.all([refreshList(), refreshSummary()]))
       .catch((e) => showToast("Delete failed: " + e.message));
   }

@@ -1,17 +1,11 @@
-{
+
+ {
   "version": 2,
-  "name": "expense-tracker",
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/frontend/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/index.html"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     }
   ]
 }
+

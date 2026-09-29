@@ -1,116 +1,703 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Expense Tracker</title>
-    <link rel="stylesheet" href="assets/styles.css" />
+
+    <meta
+        name="description"
+        content="VH Expense Tracker - Manage your income, expenses and personal finances."
+    />
+
+    <title>VH Expense Tracker</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    />
+
+    <!-- Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  </head>
-  <body>
-    <header class="summary">
-      <div class="card">
-        <div class="label">Income</div>
-        <div id="income" class="value">0</div>
-      </div>
-      <div class="card">
-        <div class="label">Expenses</div>
-        <div id="expenses" class="value">0</div>
-      </div>
-      <div class="card">
-        <div class="label">Balance</div>
-        <div id="balance" class="value">0</div>
-      </div>
-    </header>
 
-    <main class="container">
-      <section class="form-section">
-        <h2>Add / Edit Entry</h2>
-        <form id="expense-form">
-          <input type="hidden" id="expense-id" />
-          <div class="grid">
-            <div class="field">
-              <label for="title">Title</label>
-              <input id="title" type="text" required placeholder="e.g., Salary or Groceries" />
-            </div>
-            <div class="field">
-              <label for="amount">Amount</label>
-              <input id="amount" type="number" step="0.01" required />
-            </div>
-            <div class="field">
-              <label for="date">Date</label>
-              <input id="date" type="date" required />
-            </div>
-            <div class="field">
-              <label for="type">Type</label>
-              <select id="type">
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="category">Category</label>
-              <input id="category" type="text" required placeholder="e.g., Food, Rent, Salary" />
-            </div>
-          </div>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/styles.css" />
+</head>
 
-          <div class="actions">
-            <button type="submit" id="save-btn">Save</button>
-            <button type="button" id="reset-btn" class="secondary">Reset</button>
-          </div>
-        </form>
-      </section>
+<body>
 
-      <section class="list-section">
-        <div class="list-header">
-          <h2>Transactions</h2>
-          <div class="filters">
-            <select id="filter-category">
-              <option value="">All Categories</option>
-            </select>
-          </div>
+    <!-- ================================
+         SIDEBAR
+    ================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+
+            <div>
+                <h1>VH Finance</h1>
+                <span>Expense Tracker</span>
+            </div>
         </div>
 
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="expense-tbody"></tbody>
-          </table>
+        <nav class="sidebar-nav">
+
+            <a href="#dashboard" class="nav-item active">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#transactions" class="nav-item">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                <span>Transactions</span>
+            </a>
+
+            <a href="#analytics" class="nav-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+            <a href="#add-entry" class="nav-item">
+                <i class="fa-solid fa-circle-plus"></i>
+                <span>Add Transaction</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-tip">
+                <div class="tip-icon">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+
+                <div>
+                    <strong>Smart Tip</strong>
+                    <p>Track your spending regularly to improve your savings.</p>
+                </div>
+            </div>
+
         </div>
-      </section>
 
-      <section class="chart-section">
-        <div class="list-header" style="margin-bottom:.5rem">
-          <h2>Visualization</h2>
-          <div class="filters" style="display:flex; gap:.5rem; align-items:center;">
-            <select id="viz-dataset">
-              <option value="byCategory">Expenses by Category</option>
-              <option value="typeOverTime">Income vs Expense Over Time</option>
-              <option value="netOverTime">Net Balance Over Time</option>
-            </select>
-            <select id="viz-type">
-              <option value="doughnut">Doughnut</option>
-              <option value="pie">Pie</option>
-              <option value="bar">Bar</option>
-              <option value="line">Line</option>
-            </select>
-          </div>
-        </div>
-        <canvas id="categoryChart" height="160"></canvas>
-      </section>
-    </main>
-
-    <script src="assets/app.js"></script>
-  </body>
-  </html>
+    </aside>
 
 
+    <!-- ================================
+         MAIN CONTENT
+    ================================= -->
+
+    <div class="main-wrapper">
+
+        <!-- TOP NAVBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    class="mobile-menu-btn"
+                    id="mobile-menu-btn"
+                    type="button"
+                    aria-label="Open menu"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <p class="welcome-small">Welcome back 👋</p>
+                    <h2>Financial Dashboard</h2>
+                </div>
+
+            </div>
+
+            <div class="topbar-actions">
+
+                <button
+                    class="icon-button"
+                    id="theme-toggle"
+                    type="button"
+                    title="Toggle theme"
+                    aria-label="Toggle theme"
+                >
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <button
+                    class="profile-button"
+                    type="button"
+                    title="Profile"
+                >
+                    <span class="profile-avatar">V</span>
+
+                    <span class="profile-info">
+                        <strong>Veerababu</strong>
+                        <small>Personal Account</small>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <main class="dashboard-content" id="dashboard">
+
+
+            <!-- ================================
+                 HERO
+            ================================= -->
+
+            <section class="hero-card">
+
+                <div class="hero-content">
+
+                    <div class="hero-text">
+
+                        <span class="hero-label">
+                            <i class="fa-solid fa-sparkles"></i>
+                            YOUR FINANCIAL OVERVIEW
+                        </span>
+
+                        <h1>
+                            Take control of<br>
+                            your <span>money.</span>
+                        </h1>
+
+                        <p>
+                            Monitor your income, expenses and balance
+                            all in one place.
+                        </p>
+
+                        <button
+                            class="hero-button"
+                            type="button"
+                            onclick="document.getElementById('add-entry').scrollIntoView({behavior:'smooth'})"
+                        >
+                            <i class="fa-solid fa-plus"></i>
+                            Add Transaction
+                        </button>
+
+                    </div>
+
+                    <div class="hero-illustration">
+
+                        <div class="floating-money money-one">
+                            ₹
+                        </div>
+
+                        <div class="floating-money money-two">
+                            $
+                        </div>
+
+                        <div class="wallet-illustration">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 SUMMARY CARDS
+            ================================= -->
+
+            <section class="summary-grid">
+
+                <!-- INCOME -->
+
+                <article class="summary-card income-card">
+
+                    <div class="summary-card-top">
+
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+
+                        <span class="summary-status positive">
+                            <i class="fa-solid fa-arrow-up"></i>
+                            Income
+                        </span>
+
+                    </div>
+
+                    <div class="summary-label">
+                        Total Income
+                    </div>
+
+                    <div id="income" class="summary-value">
+                        ₹0
+                    </div>
+
+                    <div class="summary-footer">
+                        <span>
+                            <i class="fa-solid fa-circle"></i>
+                            All income
+                        </span>
+                    </div>
+
+                </article>
+
+
+                <!-- EXPENSE -->
+
+                <article class="summary-card expense-card">
+
+                    <div class="summary-card-top">
+
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-arrow-trend-down"></i>
+                        </div>
+
+                        <span class="summary-status negative">
+                            <i class="fa-solid fa-arrow-down"></i>
+                            Expenses
+                        </span>
+
+                    </div>
+
+                    <div class="summary-label">
+                        Total Expenses
+                    </div>
+
+                    <div id="expenses" class="summary-value">
+                        ₹0
+                    </div>
+
+                    <div class="summary-footer">
+                        <span>
+                            <i class="fa-solid fa-circle"></i>
+                            All expenses
+                        </span>
+                    </div>
+
+                </article>
+
+
+                <!-- BALANCE -->
+
+                <article class="summary-card balance-card">
+
+                    <div class="summary-card-top">
+
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+
+                        <span class="summary-status neutral">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            Balance
+                        </span>
+
+                    </div>
+
+                    <div class="summary-label">
+                        Available Balance
+                    </div>
+
+                    <div id="balance" class="summary-value">
+                        ₹0
+                    </div>
+
+                    <div class="summary-footer">
+                        <span>
+                            <i class="fa-solid fa-circle"></i>
+                            Current balance
+                        </span>
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- ================================
+                 QUICK ACTIONS
+            ================================= -->
+
+            <section class="quick-actions">
+
+                <button
+                    class="quick-action"
+                    type="button"
+                    onclick="document.getElementById('title').focus()"
+                >
+                    <span class="quick-icon add-income">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </span>
+
+                    <span>
+                        <strong>Add Income</strong>
+                        <small>Record money received</small>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    type="button"
+                    onclick="document.getElementById('title').focus()"
+                >
+                    <span class="quick-icon add-expense">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </span>
+
+                    <span>
+                        <strong>Add Expense</strong>
+                        <small>Record money spent</small>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    type="button"
+                    onclick="document.getElementById('analytics').scrollIntoView({behavior:'smooth'})"
+                >
+                    <span class="quick-icon view-analytics">
+                        <i class="fa-solid fa-chart-simple"></i>
+                    </span>
+
+                    <span>
+                        <strong>View Analytics</strong>
+                        <small>Understand your spending</small>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+            </section>
+
+
+            <!-- ================================
+                 ADD / EDIT TRANSACTION
+            ================================= -->
+
+            <section class="dashboard-section" id="add-entry">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-eyebrow">
+                            TRANSACTION MANAGEMENT
+                        </span>
+
+                        <h2>Add / Edit Entry</h2>
+
+                        <p>
+                            Keep your financial records organized.
+                        </p>
+                    </div>
+
+                    <div class="section-heading-icon">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+
+                </div>
+
+
+                <div class="form-card">
+
+                    <form id="expense-form">
+
+                        <input
+                            type="hidden"
+                            id="expense-id"
+                        />
+
+
+                        <div class="form-grid">
+
+
+                            <!-- TITLE -->
+
+                            <div class="field">
+
+                                <label for="title">
+                                    <i class="fa-solid fa-heading"></i>
+                                    Title
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <i class="fa-solid fa-file-invoice"></i>
+
+                                    <input
+                                        id="title"
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Salary, Groceries"
+                                    />
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- AMOUNT -->
+
+                            <div class="field">
+
+                                <label for="amount">
+                                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                                    Amount
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                                    <input
+                                        id="amount"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        required
+                                        placeholder="0.00"
+                                    />
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DATE -->
+
+                            <div class="field">
+
+                                <label for="date">
+                                    <i class="fa-solid fa-calendar"></i>
+                                    Date
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <i class="fa-solid fa-calendar-days"></i>
+
+                                    <input
+                                        id="date"
+                                        type="date"
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- TYPE -->
+
+                            <div class="field">
+
+                                <label for="type">
+                                    <i class="fa-solid fa-right-left"></i>
+                                    Transaction Type
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <i class="fa-solid fa-wallet"></i>
+
+                                    <select id="type">
+
+                                        <option value="expense">
+                                            Expense
+                                        </option>
+
+                                        <option value="income">
+                                            Income
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CATEGORY -->
+
+                            <div class="field field-full">
+
+                                <label for="category">
+                                    <i class="fa-solid fa-tag"></i>
+                                    Category
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <i class="fa-solid fa-layer-group"></i>
+
+                                    <input
+                                        id="category"
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Food, Rent, Travel, Salary"
+                                    />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                type="submit"
+                                id="save-btn"
+                                class="primary-button"
+                            >
+                                <i class="fa-solid fa-check"></i>
+                                Save Transaction
+                            </button>
+
+                            <button
+                                type="button"
+                                id="reset-btn"
+                                class="secondary-button secondary"
+                            >
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 TRANSACTIONS
+            ================================= -->
+
+            <section
+                class="dashboard-section"
+                id="transactions"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            FINANCIAL ACTIVITY
+                        </span>
+
+                        <h2>Recent Transactions</h2>
+
+                        <p>
+                            View and manage all your transactions.
+                        </p>
+
+                    </div>
+
+                    <div class="transaction-count">
+                        <span id="transaction-count">0</span>
+                        Transactions
+                    </div>
+
+                </div>
+
+
+                <div class="transactions-card">
+
+                    <!-- FILTER BAR -->
+
+                    <div class="filter-bar">
+
+                        <div class="search-box">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                type="search"
+                                id="search-input"
+                                placeholder="Search transactions..."
+                            />
+
+                        </div>
+
+
+                        <div class="filter-controls">
+
+                            <select id="filter-category">
+
+                                <option value="">
+                                    All Categories
+                                </option>
+
+                            </select>
+
+                            <select id="filter-type">
+
+                                <option value="">
+                                    All Types
+                                </option>
+
+                                <option value="income">
+                                    Income
+                                </option>
+
+                                <option value="expense">
+                                    Expense
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TABLE -->
+
+                    <div class="table-responsive">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Transaction
+                                    </th>
+
+                                    <th>
+                                        Amount
+                                    </th>
+
+                                    <th>
+                                        Type
+                                    </th>
+
+                                    <th>
+                                        Category
+```
